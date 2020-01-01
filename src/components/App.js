@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Filter from './Filter'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
+import Notification from './Notification'
 import phonebookService from '../services/phonebook'
 
 const App = () => {
@@ -9,6 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationType, setNotificationType] = useState(null)
 
   useEffect(() =>{
     phonebookService
@@ -42,13 +45,32 @@ const App = () => {
         number: newNumber,
         id: personToUpdate.id
       }
-      phonebookService
-        .update(personToUpdate.id, updatedPerson)
-        .then(() => {
-          setPersons(persons.map(person => person.id !== personToUpdate.id ? person : updatedPerson))
-          setNewName('')
-          setNewNumber('')
-        })
+      if(window.confirm(`Would you like to update ${updatedPerson.name}`)) {
+        phonebookService
+          .update(personToUpdate.id, updatedPerson)
+          .then(() => {
+            setPersons(persons.map(person => person.id !== personToUpdate.id ? person : updatedPerson))
+            setNotificationMessage(`${newName} has been updated in the phonebook!`)
+            setNotificationType('success')
+            setTimeout(() => {
+              setNotificationMessage(null)
+              setNotificationType(null)
+            }, 5000)
+            setNewName('')
+            setNewNumber('')
+          })
+          .catch(() => {
+            setNotificationMessage(`${newName} has already been removed from the phone book!`)
+            setNotificationType('error')
+            setTimeout(() => {
+              setNotificationMessage(null)
+              setNotificationType(null)
+            }, 5000)
+            setPersons(persons.filter(person => person.name.toLowerCase() != newName.toLowerCase()))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
     } else {
       const newPerson = {
         name: newName,
@@ -58,6 +80,12 @@ const App = () => {
         .create(newPerson)
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
+          setNotificationMessage(`${newName} has been added to the phonebook!`)
+            setNotificationType('success')
+            setTimeout(() => {
+              setNotificationMessage(null)
+              setNotificationType(null)
+            }, 5000)
           setNewName('')
           setNewNumber('')
         })
@@ -78,6 +106,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} type={notificationType} />
       <Filter handleFilterChange={handleFilterChange} />
       <PersonForm addPerson={addPerson} handleNewNameChange={handleNewNameChange} 
                   newName={newName} handleNewNumberChange={handleNewNumberChange} 

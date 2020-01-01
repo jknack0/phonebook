@@ -15,3 +15,25 @@ code {
 body {
   padding-left: 20px;
 }
+
+.success {
+  width: 25vw;
+  color: green;
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.error {
+  width: 25vw;
+  color: rgb(236, 40, 40);
+  background: lightgrey;
+  font-size: 20px;
+  border-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
