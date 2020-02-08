@@ -36,9 +36,13 @@ const App = () => {
     setNameFilter(event.target.value)
   }
 
+  const personIsInPhonebook = () => {
+    return persons.map(person => person.name.toLowerCase()).includes(newName.toLowerCase())
+  }
+
   const addPerson = (event) => {
     event.preventDefault()
-    if(persons.map(person => person.name.toLowerCase()).includes(newName.toLowerCase())) {
+    if(personIsInPhonebook()) {
       const personToUpdate = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
       const updatedPerson = {
         name: newName,
@@ -66,7 +70,7 @@ const App = () => {
               setNotificationMessage(null)
               setNotificationType(null)
             }, 5000)
-            setPersons(persons.filter(person => person.name.toLowerCase() != newName.toLowerCase()))
+            setPersons(persons.filter(person => person.name.toLowerCase() !== newName.toLowerCase()))
             setNewName('')
             setNewNumber('')
           })
@@ -81,11 +85,22 @@ const App = () => {
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
           setNotificationMessage(`${newName} has been added to the phonebook!`)
-            setNotificationType('success')
-            setTimeout(() => {
-              setNotificationMessage(null)
-              setNotificationType(null)
-            }, 5000)
+          setNotificationType('success')
+          setTimeout(() => {
+            setNotificationMessage(null)
+            setNotificationType(null)
+          }, 5000)
+          setNewName('')
+          setNewNumber('')
+        })
+        .catch(error => {
+          console.log(error.response.data)
+          setNotificationMessage(`Error: ${error.response.data.error}`)
+          setNotificationType('error')
+          setTimeout(() => {
+            setNotificationMessage(null)
+            setNotificationType(null)
+          }, 5000)
           setNewName('')
           setNewNumber('')
         })
